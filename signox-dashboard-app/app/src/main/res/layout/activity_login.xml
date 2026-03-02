@@ -98,30 +98,6 @@
                     app:cornerRadius="8dp"
                     style="@style/ButtonPrimary" />
 
-                <!-- Server Configuration Button -->
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnServerConfig"
-                    android:layout_width="match_parent"
-                    android:layout_height="48dp"
-                    android:text="Server Configuration"
-                    android:textSize="14sp"
-                    android:layout_marginTop="12dp"
-                    app:cornerRadius="8dp"
-                    app:icon="@android:drawable/ic_menu_manage"
-                    app:iconGravity="start"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
-
-                <!-- Current Server URL -->
-                <TextView
-                    android:id="@+id/tvCurrentServer"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:text="Server: Not configured"
-                    android:textSize="12sp"
-                    android:textColor="@color/text_tertiary"
-                    android:gravity="center" />
-
                 <!-- Progress Bar -->
                 <ProgressBar
                     android:id="@+id/progressBar"

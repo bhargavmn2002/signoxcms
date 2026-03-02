@@ -52,11 +52,6 @@
                 android:title="Profile" />
             
             <item
-                android:id="@+id/nav_server_settings"
-                android:icon="@android:drawable/ic_menu_preferences"
-                android:title="Server Settings" />
-            
-            <item
                 android:id="@+id/nav_logout"
                 android:icon="@android:drawable/ic_lock_lock"
                 android:title="Logout" />

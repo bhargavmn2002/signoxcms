@@ -203,7 +203,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             R.id.nav_analytics -> navigateToAnalytics()
             R.id.nav_users -> navigateToUsers()
             R.id.nav_profile -> navigateToProfile()
-            R.id.nav_server_settings -> navigateToServerSettings()
             R.id.nav_logout -> viewModel.logout()
         }
         
@@ -314,11 +313,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             .addToBackStack(null)
             .commit()
         supportActionBar?.title = "Profile"
-    }
-    
-    private fun navigateToServerSettings() {
-        val intent = Intent(this, com.signox.dashboard.ui.config.ServerConfigActivity::class.java)
-        startActivity(intent)
     }
     
     private fun logout() {

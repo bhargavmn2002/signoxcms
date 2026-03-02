@@ -37,7 +37,7 @@ class MediaDownloadManager(
     private var isRunning = false
     
     @Volatile
-    private var allowCellularDownloads = false
+    private var allowCellularDownloads = true // Enable cellular downloads by default
     
     @Volatile
     private var maxConcurrentDownloads = 2

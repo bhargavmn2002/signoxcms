@@ -128,7 +128,7 @@ export function Sidebar({ user }: SidebarProps) {
       staffRoles: ['BROADCAST_MANAGER'],
     },
     {
-      label: 'Staff Users',
+      label: 'Users',
       href: '/user/staff',
       icon: Users,
       roles: ['USER_ADMIN'],
@@ -181,8 +181,8 @@ export function Sidebar({ user }: SidebarProps) {
   };
 
   return (
-    <aside className="flex w-64 flex-col bg-white shadow-lg border-r border-gray-200">
-      <div className="flex h-20 items-center justify-center border-b border-gray-200 px-4 bg-white">
+    <aside className="flex w-64 flex-col bg-white shadow-lg border-r border-gray-200 h-screen">
+      <div className="flex h-20 items-center justify-center border-b border-gray-200 px-4 bg-white flex-shrink-0">
         <div className="flex items-center gap-3">
           <img 
             src="/signomart-full-logo.png" 
@@ -201,7 +201,7 @@ export function Sidebar({ user }: SidebarProps) {
         </div>
       </div>
 
-      <nav className="flex-1 space-y-1 p-4 bg-gray-50">
+      <nav className="flex-1 space-y-1 p-4 bg-gray-50 overflow-y-auto">
         {visibleItems.map((item) => {
           const Icon = item.icon;
           const isActive = pathname === item.href || pathname?.startsWith(item.href + '/');
@@ -217,15 +217,15 @@ export function Sidebar({ user }: SidebarProps) {
                   : 'text-gray-700 hover:bg-yellow-50 hover:text-gray-900'
               )}
             >
-              <Icon className="h-5 w-5" />
-              {item.label}
+              <Icon className="h-5 w-5 flex-shrink-0" />
+              <span className="truncate">{item.label}</span>
             </button>
           );
         })}
       </nav>
 
-      <div className="border-t border-gray-200 p-4 bg-gray-50">
-        <div className="mb-2 px-3 text-xs font-medium signomart-text-muted">
+      <div className="border-t border-gray-200 p-4 bg-gray-50 flex-shrink-0">
+        <div className="mb-2 px-3 text-xs font-medium signomart-text-muted truncate">
           {user.role === 'STAFF' && user.staffRole
             ? `${user.role} - ${user.staffRole}`
             : user.role}
@@ -234,15 +234,15 @@ export function Sidebar({ user }: SidebarProps) {
           onClick={() => router.push('/profile')}
           className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-gray-700 hover:bg-yellow-50 hover:text-gray-900 mb-2 transition-colors"
         >
-          <Settings className="h-5 w-5" />
-          Profile Settings
+          <Settings className="h-5 w-5 flex-shrink-0" />
+          <span className="truncate">Profile Settings</span>
         </button>
         <button
           onClick={handleLogout}
           className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-gray-700 hover:bg-red-50 hover:text-red-700 transition-colors"
         >
-          <LogOut className="h-5 w-5" />
-          Logout
+          <LogOut className="h-5 w-5 flex-shrink-0" />
+          <span className="truncate">Logout</span>
         </button>
       </div>
     </aside>

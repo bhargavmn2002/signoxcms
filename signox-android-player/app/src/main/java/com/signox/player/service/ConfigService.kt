@@ -328,6 +328,12 @@ class ConfigService(private val repository: PlayerRepository) {
                         item.media?.url?.let { url ->
                             currentMediaUrls.add(url)
                         }
+                        // Also add originalUrl (MP4) to prevent it from being cleaned up
+                        item.media?.originalUrl?.let { originalUrl ->
+                            if (originalUrl.isNotEmpty()) {
+                                currentMediaUrls.add(originalUrl)
+                            }
+                        }
                     }
                 }
                 offlineLoader.preloadLayout(layout)
@@ -339,6 +345,12 @@ class ConfigService(private val repository: PlayerRepository) {
                 playlist.items.forEach { item ->
                     item.media?.url?.let { url ->
                         currentMediaUrls.add(url)
+                    }
+                    // Also add originalUrl (MP4) to prevent it from being cleaned up
+                    item.media?.originalUrl?.let { originalUrl ->
+                        if (originalUrl.isNotEmpty()) {
+                            currentMediaUrls.add(originalUrl)
+                        }
                     }
                 }
                 offlineLoader.preloadPlaylist(playlist)

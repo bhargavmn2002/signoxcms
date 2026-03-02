@@ -40,7 +40,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:gravity="center"
-        android:text="Enter your SignoX backend server address"
+        android:text="Enter your Signox backend server address"
         android:textColor="@color/text_secondary"
         android:textSize="14sp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -79,7 +79,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:text="Example: 192.168.1.100:5000"
+        android:text="Default: www.signoxcms.com"
         android:textColor="@color/primary"
         android:textSize="12sp"
         android:textStyle="italic"
@@ -141,7 +141,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="• Make sure your device is on the same network as the server\n• Use the server's IP address and port (default: 5000)\n• Include http:// or https:// in the URL"
+                android:text="• Default server: www.signoxcms.com\n• For local server, use IP address and port\n• Include https:// or http:// in the URL"
                 android:textColor="@color/text_secondary"
                 android:textSize="12sp" />
 

@@ -2,11 +2,12 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Activity, Monitor, Users, Building2, User, Crown, Calendar, TrendingUp } from 'lucide-react';
+import { Activity, Monitor, Users, Building2, User, Crown, Calendar, TrendingUp, HardDrive } from 'lucide-react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { StatCard } from '@/components/dashboard/StatCard';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { StorageIndicator } from '@/components/ui/storage-indicator';
 import api from '@/lib/api';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
@@ -19,6 +20,16 @@ interface ClientSummary {
     status: string;
     expiry: string | null;
   };
+}
+
+interface StorageInfo {
+  limitMB: number;
+  usedMB: number;
+  availableMB: number;
+  maxMonthlyUsageMB?: number;
+  monthlyUploadedMB?: number;
+  monthlyQuotaRemainingMB?: number;
+  quotaResetDate?: Date | string;
 }
 
 type HierarchyInfo = {
@@ -47,6 +58,7 @@ export default function ClientDashboard() {
   const [summary, setSummary] = useState<ClientSummary | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [hierarchy, setHierarchy] = useState<HierarchyInfo | null>(null);
+  const [storageInfo, setStorageInfo] = useState<StorageInfo | null>(null);
 
   useEffect(() => {
     // Initialize AOS
@@ -77,6 +89,14 @@ export default function ClientDashboard() {
         setProfile(null);
         setHierarchy(null);
       });
+
+    // Fetch storage info
+    api
+      .get('/media/storage-info')
+      .then((res) => {
+        setStorageInfo(res.data.storageInfo);
+      })
+      .catch(() => setStorageInfo(null));
   }, []);
 
   const licenseLabel =
@@ -286,6 +306,26 @@ export default function ClientDashboard() {
             </CardContent>
           </Card>
         </div>
+
+        {/* Storage & Usage */}
+        <Card className="border-gray-200 shadow-lg hover:shadow-xl transition-shadow duration-300" data-aos="fade-up" data-aos-delay="300">
+          <CardHeader className="bg-gradient-to-r from-green-50 to-emerald-50">
+            <CardTitle className="flex items-center gap-3 text-xl">
+              <div className="bg-gradient-to-br from-green-400 to-green-600 p-3 rounded-xl">
+                <HardDrive className="h-6 w-6 text-white" />
+              </div>
+              Storage & Monthly Usage
+            </CardTitle>
+            <CardDescription>Organization-wide storage and upload quota</CardDescription>
+          </CardHeader>
+          <CardContent className="pt-6">
+            {storageInfo ? (
+              <StorageIndicator storageInfo={storageInfo} />
+            ) : (
+              <div className="text-center text-gray-500 py-4">Loading storage info...</div>
+            )}
+          </CardContent>
+        </Card>
       </div>
     </DashboardLayout>
   );

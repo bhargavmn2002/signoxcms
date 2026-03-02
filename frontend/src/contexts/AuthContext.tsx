@@ -121,10 +121,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const logout = () => {
+    console.log('🚪 Logging out...');
+    
+    // Clear tokens first
     Cookies.remove('accessToken');
     localStorage.removeItem('accessToken');
+    
+    // Clear user state
     setUser(null);
-    router.push('/login');
+    
+    // Force full page reload to login page
+    // This ensures all component state is cleared
+    if (typeof window !== 'undefined') {
+      window.location.replace('/login');
+    }
   };
 
   return (

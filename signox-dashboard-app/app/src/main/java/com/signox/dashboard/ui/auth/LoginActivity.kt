@@ -35,7 +35,6 @@ class LoginActivity : AppCompatActivity() {
         
         setupUI()
         observeViewModel()
-        loadCurrentServerUrl()
         animateViews()
     }
     
@@ -54,83 +53,6 @@ class LoginActivity : AppCompatActivity() {
             
             viewModel.login(email, password)
         }
-        
-        binding.btnServerConfig.setOnClickListener {
-            AnimationUtils.pulse(binding.btnServerConfig)
-            showServerConfigDialog()
-        }
-    }
-    
-    private fun loadCurrentServerUrl() {
-        lifecycleScope.launch {
-            val serverUrl = serverConfigManager.getServerUrlSync()
-            binding.tvCurrentServer.text = "Server: $serverUrl"
-        }
-    }
-    
-    private fun showServerConfigDialog() {
-        val dialogView = layoutInflater.inflate(R.layout.dialog_server_config, null)
-        val etServerUrl = dialogView.findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.etServerUrl)
-        
-        val dialog = AlertDialog.Builder(this)
-            .setView(dialogView)
-            .setCancelable(true)
-            .create()
-        
-        // Load current server URL before showing dialog
-        lifecycleScope.launch {
-            val currentUrl = serverConfigManager.getServerUrlSync()
-            etServerUrl.setText(currentUrl)
-            
-            // Show dialog after loading the URL
-            dialog.show()
-        }
-        
-        dialogView.findViewById<com.google.android.material.button.MaterialButton>(R.id.btnCancel).setOnClickListener {
-            dialog.dismiss()
-        }
-        
-        dialogView.findViewById<com.google.android.material.button.MaterialButton>(R.id.btnSave).setOnClickListener {
-            val newUrl = etServerUrl.text.toString().trim()
-            
-            if (newUrl.isEmpty()) {
-                Toast.makeText(this, "Please enter a server URL", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-            
-            if (!newUrl.startsWith("http://") && !newUrl.startsWith("https://")) {
-                Toast.makeText(this, "URL must start with http:// or https://", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-            
-            lifecycleScope.launch {
-                serverConfigManager.saveServerUrl(newUrl)
-                binding.tvCurrentServer.text = "Server: $newUrl"
-                dialog.dismiss()
-                
-                // Show dialog to restart app
-                AlertDialog.Builder(this@LoginActivity)
-                    .setTitle("Restart Required")
-                    .setMessage("The server URL has been updated. The app will now restart to apply the changes.")
-                    .setCancelable(false)
-                    .setPositiveButton("Restart") { _, _ ->
-                        restartApp()
-                    }
-                    .show()
-            }
-        }
-        
-        dialog.show()
-    }
-    
-    private fun restartApp() {
-        // Clear all activities and restart
-        val intent = packageManager.getLaunchIntentForPackage(packageName)
-        intent?.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-        startActivity(intent)
-        
-        // Kill the current process to ensure clean restart
-        android.os.Process.killProcess(android.os.Process.myPid())
     }
     
     private fun observeViewModel() {

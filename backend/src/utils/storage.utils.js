@@ -139,9 +139,75 @@ async function calculateClientStorageUsage(clientAdminId) {
 }
 
 /**
- * Get client storage limits and usage
+ * Check if monthly usage quota needs reset and reset if necessary
  * @param {string} clientAdminId - The client admin ID
- * @returns {Promise<{limitMB: number, usedBytes: number, usedMB: number, availableBytes: number, availableMB: number}>}
+ * @returns {Promise<boolean>} - true if reset occurred
+ */
+async function checkAndResetMonthlyQuota(clientAdminId) {
+  if (!clientAdminId) return false;
+
+  const clientProfile = await prisma.clientProfile.findUnique({
+    where: { clientAdminId },
+    select: { 
+      usageQuotaResetDate: true, 
+      billingDayOfMonth: true,
+      monthlyUploadedBytes: true 
+    }
+  });
+
+  if (!clientProfile) return false;
+
+  const now = new Date();
+  const lastReset = new Date(clientProfile.usageQuotaResetDate);
+  const billingDay = clientProfile.billingDayOfMonth || 1;
+
+  // Calculate next reset date based on billing day
+  const nextResetDate = new Date(lastReset);
+  nextResetDate.setMonth(nextResetDate.getMonth() + 1);
+  
+  // Handle edge case: if billing day doesn't exist in next month (e.g., Feb 30), use last day
+  const maxDayInMonth = new Date(nextResetDate.getFullYear(), nextResetDate.getMonth() + 1, 0).getDate();
+  nextResetDate.setDate(Math.min(billingDay, maxDayInMonth));
+
+  // If we've passed the reset date, reset the quota
+  if (now >= nextResetDate) {
+    console.log(`🔄 Resetting monthly quota for client ${clientAdminId}`);
+    await prisma.clientProfile.update({
+      where: { clientAdminId },
+      data: {
+        monthlyUploadedBytes: 0,
+        usageQuotaResetDate: now
+      }
+    });
+    return true;
+  }
+
+  return false;
+}
+
+/**
+ * Increment monthly upload counter
+ * @param {string} clientAdminId - The client admin ID
+ * @param {number} bytes - Bytes to add to monthly counter
+ */
+async function incrementMonthlyUpload(clientAdminId, bytes) {
+  if (!clientAdminId || !bytes) return;
+
+  await prisma.clientProfile.update({
+    where: { clientAdminId },
+    data: {
+      monthlyUploadedBytes: {
+        increment: bytes
+      }
+    }
+  });
+  console.log(`📊 Incremented monthly upload for client ${clientAdminId} by ${bytes} bytes`);
+}
+
+/**
+ * Get client storage limits and usage (both storage and monthly usage)
+ * @param {string} clientAdminId - The client admin ID
+ * @returns {Promise<{limitMB: number, usedBytes: number, usedMB: number, availableBytes: number, availableMB: number, maxMonthlyUsageMB: number, monthlyUploadedBytes: number, monthlyUploadedMB: number, monthlyQuotaRemainingBytes: number, monthlyQuotaRemainingMB: number, quotaResetDate: Date}>}
  */
 async function getClientStorageInfo(clientAdminId) {
   if (!clientAdminId) {
@@ -150,36 +216,80 @@ async function getClientStorageInfo(clientAdminId) {
       usedBytes: 0,
       usedMB: 0,
       availableBytes: 0,
-      availableMB: 0
+      availableMB: 0,
+      maxMonthlyUsageMB: 0,
+      monthlyUploadedBytes: 0,
+      monthlyUploadedMB: 0,
+      monthlyQuotaRemainingBytes: 0,
+      monthlyQuotaRemainingMB: 0,
+      quotaResetDate: null
     };
   }
 
-  // Get client profile to find storage limit
+  // Check and reset quota if needed
+  await checkAndResetMonthlyQuota(clientAdminId);
+
+  // Get client profile to find storage and usage limits
   const clientProfile = await prisma.clientProfile.findUnique({
     where: { clientAdminId },
-    select: { maxStorageMB: true }
+    select: { 
+      maxStorageMB: true,
+      maxMonthlyUsageMB: true,
+      monthlyUploadedBytes: true,
+      usageQuotaResetDate: true,
+      billingDayOfMonth: true
+    }
   });
 
+  // Storage limits (disk space)
   const limitMB = clientProfile?.maxStorageMB || 25;
   const limitBytes = limitMB * 1024 * 1024;
 
   const usedBytes = await calculateClientStorageUsage(clientAdminId);
-  const usedMB = Math.round((usedBytes / (1024 * 1024)) * 100) / 100; // Round to 2 decimal places
+  const usedMB = Math.round((usedBytes / (1024 * 1024)) * 100) / 100;
 
   const availableBytes = Math.max(0, limitBytes - usedBytes);
   const availableMB = Math.round((availableBytes / (1024 * 1024)) * 100) / 100;
 
+  // Monthly usage limits (bandwidth/transfer quota)
+  const maxMonthlyUsageMB = clientProfile?.maxMonthlyUsageMB || 150;
+  const maxMonthlyUsageBytes = maxMonthlyUsageMB * 1024 * 1024;
+
+  // Convert BigInt to number for calculations and JSON serialization
+  const monthlyUploadedBytes = Number(clientProfile?.monthlyUploadedBytes || 0);
+  const monthlyUploadedMB = Math.round((monthlyUploadedBytes / (1024 * 1024)) * 100) / 100;
+
+  const monthlyQuotaRemainingBytes = Math.max(0, maxMonthlyUsageBytes - monthlyUploadedBytes);
+  const monthlyQuotaRemainingMB = Math.round((monthlyQuotaRemainingBytes / (1024 * 1024)) * 100) / 100;
+
+  // Calculate next reset date
+  const lastReset = new Date(clientProfile?.usageQuotaResetDate || new Date());
+  const billingDay = clientProfile?.billingDayOfMonth || 1;
+  const nextResetDate = new Date(lastReset);
+  nextResetDate.setMonth(nextResetDate.getMonth() + 1);
+  const maxDayInMonth = new Date(nextResetDate.getFullYear(), nextResetDate.getMonth() + 1, 0).getDate();
+  nextResetDate.setDate(Math.min(billingDay, maxDayInMonth));
+
   return {
+    // Storage (disk space)
     limitMB,
     usedBytes,
     usedMB,
     availableBytes,
-    availableMB
+    availableMB,
+    // Monthly usage (bandwidth/transfer)
+    maxMonthlyUsageMB,
+    monthlyUploadedBytes,
+    monthlyUploadedMB,
+    monthlyQuotaRemainingBytes,
+    monthlyQuotaRemainingMB,
+    quotaResetDate: nextResetDate
   };
 }
 
 /**
  * Check if a client can upload a file of given size
+ * Checks BOTH storage limit (disk space) AND monthly usage quota
  * @param {string} userId - The user ID attempting to upload
  * @param {number} fileSizeBytes - The size of the file to upload in bytes
  * @returns {Promise<{canUpload: boolean, reason?: string, storageInfo: object}>}
@@ -196,12 +306,23 @@ async function checkStorageLimit(userId, fileSizeBytes) {
   }
 
   const storageInfo = await getClientStorageInfo(clientAdminId);
+  const fileSizeMB = Math.round((fileSizeBytes / (1024 * 1024)) * 100) / 100;
 
+  // CHECK 1: Current storage on disk (can we fit this file?)
   if (fileSizeBytes > storageInfo.availableBytes) {
-    const fileSizeMB = Math.round((fileSizeBytes / (1024 * 1024)) * 100) / 100;
     return {
       canUpload: false,
-      reason: `File size (${fileSizeMB}MB) exceeds available storage (${storageInfo.availableMB}MB). Total limit: ${storageInfo.limitMB}MB, currently used: ${storageInfo.usedMB}MB.`,
+      reason: `Storage limit exceeded. File size (${fileSizeMB}MB) exceeds available storage (${storageInfo.availableMB}MB). Total storage limit: ${storageInfo.limitMB}MB, currently used: ${storageInfo.usedMB}MB. Please delete some files to free up space.`,
+      storageInfo
+    };
+  }
+
+  // CHECK 2: Monthly usage quota (have we uploaded too much this month?)
+  if (fileSizeBytes > storageInfo.monthlyQuotaRemainingBytes) {
+    const resetDate = storageInfo.quotaResetDate ? storageInfo.quotaResetDate.toLocaleDateString() : 'next billing cycle';
+    return {
+      canUpload: false,
+      reason: `Monthly usage quota exceeded. File size (${fileSizeMB}MB) exceeds remaining monthly quota (${storageInfo.monthlyQuotaRemainingMB}MB). Monthly limit: ${storageInfo.maxMonthlyUsageMB}MB, used this month: ${storageInfo.monthlyUploadedMB}MB. Quota resets on ${resetDate}.`,
       storageInfo
     };
   }
@@ -216,5 +337,7 @@ module.exports = {
   getClientAdminId,
   calculateClientStorageUsage,
   getClientStorageInfo,
-  checkStorageLimit
+  checkStorageLimit,
+  incrementMonthlyUpload,
+  checkAndResetMonthlyQuota
 };

@@ -47,6 +47,7 @@ exports.createClientAdmin = async (req, res) => {
       maxDisplays,
       maxUsers,
       maxStorageMB,
+      maxMonthlyUsageMB,
       licenseExpiry,
     } = req.body;
 
@@ -85,6 +86,7 @@ exports.createClientAdmin = async (req, res) => {
           maxDisplays: Number.isFinite(Number(maxDisplays)) ? Number(maxDisplays) : 10,
           maxUsers: Number.isFinite(Number(maxUsers)) ? Number(maxUsers) : 5,
           maxStorageMB: Number.isFinite(Number(maxStorageMB)) ? Number(maxStorageMB) : 25,
+          maxMonthlyUsageMB: Number.isFinite(Number(maxMonthlyUsageMB)) ? Number(maxMonthlyUsageMB) : 150,
           licenseExpiry: licenseExpiry ? new Date(licenseExpiry) : null,
           isActive: true,
           contactEmail: email,
@@ -94,6 +96,12 @@ exports.createClientAdmin = async (req, res) => {
       return { user, profile };
     });
 
+    // Convert BigInt to number for JSON serialization
+    const profileForResponse = {
+      ...created.profile,
+      monthlyUploadedBytes: Number(created.profile.monthlyUploadedBytes || 0)
+    };
+
     res.status(201).json({
       message: 'Client Admin created',
       clientAdmin: {
@@ -101,7 +109,7 @@ exports.createClientAdmin = async (req, res) => {
         email: created.user.email,
         role: created.user.role,
         isActive: created.user.isActive,
-        clientProfile: created.profile,
+        clientProfile: profileForResponse,
       },
       // keep name in response for UI even though not stored
       name: name || null,
@@ -156,13 +164,21 @@ exports.listClientAdmins = async (req, res) => {
           }
         }
 
+        // Convert BigInt fields to numbers for JSON serialization
+        const clientProfile = u.clientProfile ? {
+          ...u.clientProfile,
+          monthlyUploadedBytes: u.clientProfile.monthlyUploadedBytes 
+            ? Number(u.clientProfile.monthlyUploadedBytes) 
+            : 0
+        } : null;
+
         return {
           id: u.id,
           email: u.email,
           role: u.role,
           isActive: u.isActive,
           createdAt: u.createdAt,
-          clientProfile: u.clientProfile,
+          clientProfile,
           displaysUsed,
           licenseStatus,
           daysUntilExpiry,
@@ -305,6 +321,7 @@ exports.updateClientAdmin = async (req, res) => {
       maxDisplays,
       maxUsers,
       maxStorageMB,
+      maxMonthlyUsageMB,
       licenseExpiry,
       contactEmail,
       contactPhone,
@@ -360,6 +377,7 @@ exports.updateClientAdmin = async (req, res) => {
         ...(maxDisplays !== undefined && { maxDisplays: Number(maxDisplays) }),
         ...(maxUsers !== undefined && { maxUsers: Number(maxUsers) }),
         ...(maxStorageMB !== undefined && { maxStorageMB: Number(maxStorageMB) }),
+        ...(maxMonthlyUsageMB !== undefined && { maxMonthlyUsageMB: Number(maxMonthlyUsageMB) }),
         ...(licenseExpiry !== undefined && { 
           licenseExpiry: licenseExpiry ? new Date(licenseExpiry) : null 
         }),
@@ -374,6 +392,12 @@ exports.updateClientAdmin = async (req, res) => {
       include: { clientProfile: true }
     });
 
+    // Convert BigInt to number for JSON serialization
+    const profileForResponse = updatedClientAdmin.clientProfile ? {
+      ...updatedClientAdmin.clientProfile,
+      monthlyUploadedBytes: Number(updatedClientAdmin.clientProfile.monthlyUploadedBytes || 0)
+    } : null;
+
     res.json({
       message: 'Client Admin updated successfully',
       clientAdmin: {
@@ -382,7 +406,7 @@ exports.updateClientAdmin = async (req, res) => {
         role: updatedClientAdmin.role,
         isActive: updatedClientAdmin.isActive,
         createdAt: updatedClientAdmin.createdAt,
-        clientProfile: updatedClientAdmin.clientProfile,
+        clientProfile: profileForResponse,
       },
     });
   } catch (error) {

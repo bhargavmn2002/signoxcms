@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">SignoX Dashboard</string>
+    <string name="app_name">Signox Dashboard</string>
     
     <!-- Login -->
-    <string name="login_title">SignoX</string>
+    <string name="login_title">Signox</string>
     <string name="login_subtitle">Digital Signage Management</string>
     <string name="login_description">Digital Signage Management System</string>
+    <string name="logo_title">Signox</string>
+    <string name="logo_subtitle"><u>Signage Management System</u></string>
     <string name="email">Email</string>
     <string name="password">Password</string>
     <string name="login">Sign In</string>

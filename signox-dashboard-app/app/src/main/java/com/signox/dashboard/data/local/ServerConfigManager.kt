@@ -18,8 +18,7 @@ class ServerConfigManager @Inject constructor(
     companion object {
         private val SERVER_URL_KEY = stringPreferencesKey("server_url")
         // Default server URL - users can change this in the app
-        // Find your IP with: hostname -I
-        const val DEFAULT_SERVER_URL = "http://192.168.1.232:5000"
+        const val DEFAULT_SERVER_URL = "https://www.signoxcms.com"
     }
     
     suspend fun saveServerUrl(url: String) {

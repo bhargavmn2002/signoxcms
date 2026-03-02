@@ -258,6 +258,8 @@ export default function MediaLibraryPage() {
 
       console.log('📤 [UPLOAD DEBUG] Sending upload request...');
       const response = await api.post('/media', form, {
+        // Increase timeout for media uploads (especially videos with HLS conversion)
+        timeout: 300000, // 5 minutes for large video files
         // Don't set Content-Type manually - let axios/browser set it with boundary for FormData
         onUploadProgress: (evt) => {
           const total = evt.total ?? 0;

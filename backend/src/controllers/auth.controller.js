@@ -208,6 +208,12 @@ exports.login = async (req, res) => {
     // Don't send sensitive data
     const { password: _, ...userResponse } = userWithProfile;
     
+    // Convert BigInt to number for JSON serialization
+    const clientProfileForResponse = userResponse.clientProfile ? {
+      ...userResponse.clientProfile,
+      monthlyUploadedBytes: Number(userResponse.clientProfile.monthlyUploadedBytes || 0)
+    } : null;
+    
     return res.json({
       accessToken: token,
       user: {
@@ -216,7 +222,7 @@ exports.login = async (req, res) => {
         role: userResponse.role,
         staffRole: userResponse.staffRole,
         isActive: userResponse.isActive,
-        clientProfile: userResponse.clientProfile,
+        clientProfile: clientProfileForResponse,
       },
     });
   } catch (error) {
@@ -238,6 +244,12 @@ exports.me = async (req, res) => {
       return res.status(404).json({ message: 'User not found' });
     }
 
+    // Convert BigInt to number for JSON serialization
+    const clientProfileForResponse = user.clientProfile ? {
+      ...user.clientProfile,
+      monthlyUploadedBytes: Number(user.clientProfile.monthlyUploadedBytes || 0)
+    } : null;
+
     res.json({
       user: {
         id: user.id,
@@ -245,7 +257,7 @@ exports.me = async (req, res) => {
         role: user.role,
         staffRole: user.staffRole,
         isActive: user.isActive,
-        clientProfile: user.clientProfile,
+        clientProfile: clientProfileForResponse,
       },
     });
   } catch (error) {

@@ -84,6 +84,7 @@ export default function SuperAdminClientsPage() {
     maxDisplays: '10',
     maxUsers: '5',
     maxStorageMB: '25',
+    maxMonthlyUsageMB: '150',
     licenseExpiry: '',
   });
 
@@ -92,6 +93,7 @@ export default function SuperAdminClientsPage() {
     maxDisplays: '10',
     maxUsers: '5',
     maxStorageMB: '25',
+    maxMonthlyUsageMB: '150',
     licenseExpiry: '',
     contactEmail: '',
     contactPhone: '',
@@ -174,6 +176,7 @@ export default function SuperAdminClientsPage() {
         maxDisplays: Number(form.maxDisplays || 10),
         maxUsers: Number(form.maxUsers || 5),
         maxStorageMB: Number(form.maxStorageMB || 25),
+        maxMonthlyUsageMB: Number(form.maxMonthlyUsageMB || 150),
         licenseExpiry: form.licenseExpiry || null,
       });
 
@@ -186,6 +189,7 @@ export default function SuperAdminClientsPage() {
         maxDisplays: '10',
         maxUsers: '5',
         maxStorageMB: '25',
+        maxMonthlyUsageMB: '150',
         licenseExpiry: '',
       });
 
@@ -230,6 +234,7 @@ export default function SuperAdminClientsPage() {
       maxDisplays: client.clientProfile?.maxDisplays?.toString() || '10',
       maxUsers: client.clientProfile?.maxUsers?.toString() || '5',
       maxStorageMB: client.clientProfile?.maxStorageMB?.toString() || '25',
+      maxMonthlyUsageMB: (client.clientProfile as any)?.maxMonthlyUsageMB?.toString() || '150',
       licenseExpiry: client.clientProfile?.licenseExpiry ? 
         new Date(client.clientProfile.licenseExpiry).toISOString().split('T')[0] : '',
       contactEmail: client.clientProfile?.contactEmail || '',
@@ -256,6 +261,7 @@ export default function SuperAdminClientsPage() {
         maxDisplays: Number(editForm.maxDisplays || 10),
         maxUsers: Number(editForm.maxUsers || 5),
         maxStorageMB: Number(editForm.maxStorageMB || 25),
+        maxMonthlyUsageMB: Number(editForm.maxMonthlyUsageMB || 150),
         licenseExpiry: editForm.licenseExpiry || null,
         contactEmail: editForm.contactEmail || null,
         contactPhone: editForm.contactPhone || null,
@@ -268,6 +274,7 @@ export default function SuperAdminClientsPage() {
         maxDisplays: '10',
         maxUsers: '5',
         maxStorageMB: '25',
+        maxMonthlyUsageMB: '150',
         licenseExpiry: '',
         contactEmail: '',
         contactPhone: '',
@@ -409,6 +416,17 @@ export default function SuperAdminClientsPage() {
                       value={form.maxStorageMB}
                       onChange={(e) => setForm({ ...form, maxStorageMB: e.target.value })}
                     />
+                    <p className="text-xs text-gray-500">Maximum disk space for stored files</p>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Monthly Usage Limit (MB)</Label>
+                    <Input
+                      type="number"
+                      min="1"
+                      value={form.maxMonthlyUsageMB}
+                      onChange={(e) => setForm({ ...form, maxMonthlyUsageMB: e.target.value })}
+                    />
+                    <p className="text-xs text-gray-500">Maximum uploads per month (resets monthly)</p>
                   </div>
                   <div className="space-y-2">
                     <Label>License Expiry</Label>
@@ -701,6 +719,17 @@ export default function SuperAdminClientsPage() {
                   value={editForm.maxStorageMB}
                   onChange={(e) => setEditForm({ ...editForm, maxStorageMB: e.target.value })}
                 />
+                <p className="text-xs text-gray-500">Maximum disk space</p>
+              </div>
+              <div className="space-y-2">
+                <Label>Monthly Usage Limit (MB)</Label>
+                <Input
+                  type="number"
+                  min="1"
+                  value={editForm.maxMonthlyUsageMB}
+                  onChange={(e) => setEditForm({ ...editForm, maxMonthlyUsageMB: e.target.value })}
+                />
+                <p className="text-xs text-gray-500">Monthly upload quota</p>
               </div>
             </div>
 

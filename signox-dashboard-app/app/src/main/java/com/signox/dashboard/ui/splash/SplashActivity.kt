@@ -42,17 +42,15 @@ class SplashActivity : AppCompatActivity() {
             // Show splash for at least 1.5 seconds
             delay(1500)
             
-            // First check if server is configured
+            // Check if server is configured, if not use default
             val isServerConfigured = serverConfigManager.isServerConfigured()
             
             if (!isServerConfigured) {
-                // Server not configured, go to server config
-                startActivity(Intent(this@SplashActivity, ServerConfigActivity::class.java))
-                finish()
-                return@launch
+                // Save default server URL
+                serverConfigManager.saveServerUrl(ServerConfigManager.DEFAULT_SERVER_URL)
             }
             
-            // Server is configured, check auth status
+            // Check auth status
             val token = tokenManager.getToken().first()
             
             if (!token.isNullOrEmpty()) {

@@ -8,6 +8,7 @@ import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { StatCard } from '@/components/dashboard/StatCard';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { StorageIndicator } from '@/components/ui/storage-indicator';
 import api from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import AOS from 'aos';
@@ -22,6 +23,16 @@ interface UserSummary {
   mediaCount: number;
   playlistCount: number;
   storageBytes: number;
+}
+
+interface StorageInfo {
+  limitMB: number;
+  usedMB: number;
+  availableMB: number;
+  maxMonthlyUsageMB?: number;
+  monthlyUploadedMB?: number;
+  monthlyQuotaRemainingMB?: number;
+  quotaResetDate?: Date | string;
 }
 
 type HierarchyInfo = {
@@ -58,6 +69,7 @@ export default function UserAdminDashboard() {
   const [summary, setSummary] = useState<UserSummary | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [hierarchy, setHierarchy] = useState<HierarchyInfo | null>(null);
+  const [storageInfo, setStorageInfo] = useState<StorageInfo | null>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -89,6 +101,14 @@ export default function UserAdminDashboard() {
         setProfile(null);
         setHierarchy(null);
       });
+
+    // Fetch storage info
+    api
+      .get('/media/storage-info')
+      .then((res) => {
+        setStorageInfo(res.data.storageInfo);
+      })
+      .catch(() => setStorageInfo(null));
   }, []);
 
   const healthSubtitle =
@@ -121,48 +141,50 @@ export default function UserAdminDashboard() {
 
   return (
     <DashboardLayout>
-      <div className="space-y-8 pb-8">
+      <div className="space-y-6 sm:space-y-8 pb-8">
         {/* Header Section */}
         <div className="relative" data-aos="fade-down">
-          <div className="absolute inset-0 bg-gradient-to-r from-yellow-400/10 to-orange-500/10 rounded-3xl blur-3xl"></div>
-          <div className="relative bg-gradient-to-br from-gray-900 to-black rounded-3xl p-8 border border-gray-800 shadow-2xl">
-            <div className="flex items-center justify-between gap-4 flex-wrap">
-              <div>
-                <div className="flex items-center gap-3 mb-2">
-                  <Sparkles className="h-10 w-10 text-yellow-400" />
-                  <h1 className="text-4xl font-black text-white">Dashboard</h1>
+          <div className="absolute inset-0 bg-gradient-to-r from-yellow-400/10 to-orange-500/10 rounded-2xl sm:rounded-3xl blur-3xl"></div>
+          <div className="relative bg-gradient-to-br from-gray-900 to-black rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 border border-gray-800 shadow-2xl overflow-hidden">
+            <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
+              <div className="w-full lg:w-auto min-w-0">
+                <div className="flex items-center gap-2 sm:gap-3 mb-2 flex-wrap">
+                  <Sparkles className="h-8 w-8 sm:h-10 sm:w-10 text-yellow-400 flex-shrink-0" />
+                  <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-white break-words">Dashboard</h1>
                   {profile && (
-                    <Badge className="bg-yellow-400 text-black font-bold px-4 py-1">
+                    <Badge className="bg-yellow-400 text-black font-bold px-2 sm:px-4 py-1 text-xs sm:text-sm whitespace-nowrap">
                       {getRoleDisplayName(profile.role, profile.staffRole)}
                     </Badge>
                   )}
                 </div>
-                <div className="flex items-center gap-4 flex-wrap">
-                  <p className="text-gray-300 text-lg">Display health and content overview</p>
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 flex-wrap">
+                  <p className="text-gray-300 text-sm sm:text-base lg:text-lg break-words">Display health and content overview</p>
                   {hierarchy?.companyName && (
-                    <div className="flex items-center gap-2 bg-white/10 px-4 py-2 rounded-xl border border-white/20">
-                      <Building2 className="h-4 w-4 text-yellow-400" />
-                      <span className="text-white font-semibold">{hierarchy.companyName}</span>
+                    <div className="flex items-center gap-2 bg-white/10 px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl border border-white/20 max-w-full">
+                      <Building2 className="h-3 w-3 sm:h-4 sm:w-4 text-yellow-400 flex-shrink-0" />
+                      <span className="text-white font-semibold text-xs sm:text-sm truncate">{hierarchy.companyName}</span>
                     </div>
                   )}
                 </div>
               </div>
 
-              <div className="flex flex-wrap gap-3">
+              <div className="flex flex-wrap gap-2 sm:gap-3 w-full lg:w-auto">
                 <Button
-                  className="gap-2 bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-500 hover:to-yellow-600 text-black font-bold shadow-lg hover:shadow-yellow-500/50 transition-all duration-300 hover:scale-105"
+                  className="flex-1 sm:flex-none gap-2 bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-500 hover:to-yellow-600 text-black font-bold shadow-lg hover:shadow-yellow-500/50 transition-all duration-300 hover:scale-105 text-sm sm:text-base whitespace-nowrap"
                   onClick={() => router.push('/user/displays')}
                 >
-                  <PlusCircle className="h-5 w-5" />
-                  Add Display
+                  <PlusCircle className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
+                  <span className="hidden sm:inline">Add Display</span>
+                  <span className="sm:hidden">Display</span>
                 </Button>
                 <Button
                   variant="outline"
-                  className="gap-2 border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-black font-bold transition-all duration-300"
+                  className="flex-1 sm:flex-none gap-2 border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-black font-bold transition-all duration-300 text-sm sm:text-base whitespace-nowrap"
                   onClick={() => router.push('/user/media')}
                 >
-                  <Upload className="h-5 w-5" />
-                  Upload Media
+                  <Upload className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
+                  <span className="hidden sm:inline">Upload Media</span>
+                  <span className="sm:hidden">Upload</span>
                 </Button>
               </div>
             </div>
@@ -182,22 +204,22 @@ export default function UserAdminDashboard() {
               <CardDescription className="text-base">Your account and organization details</CardDescription>
             </CardHeader>
             <CardContent className="pt-6">
-              <div className="grid gap-6 md:grid-cols-3">
+              <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
                 <div className="bg-gray-50 p-4 rounded-xl">
                   <p className="text-sm font-semibold text-gray-600 uppercase tracking-wide mb-2">Email</p>
-                  <p className="text-lg font-bold text-gray-900">{profile?.email || 'Loading...'}</p>
+                  <p className="text-lg font-bold text-gray-900 break-words">{profile?.email || 'Loading...'}</p>
                 </div>
                 {hierarchy?.clientAdmin && (
                   <div className="bg-gray-50 p-4 rounded-xl">
                     <p className="text-sm font-semibold text-gray-600 uppercase tracking-wide mb-2">Client Administrator</p>
-                    <p className="text-lg font-bold text-gray-900">{hierarchy.clientAdmin.name}</p>
-                    <p className="text-sm text-gray-500 mt-1">{hierarchy.clientAdmin.email}</p>
+                    <p className="text-lg font-bold text-gray-900 break-words">{hierarchy.clientAdmin.name}</p>
+                    <p className="text-sm text-gray-500 mt-1 break-words">{hierarchy.clientAdmin.email}</p>
                   </div>
                 )}
                 {hierarchy?.companyName && (
                   <div className="bg-gray-50 p-4 rounded-xl">
                     <p className="text-sm font-semibold text-gray-600 uppercase tracking-wide mb-2">Company</p>
-                    <p className="text-lg font-bold text-gray-900">{hierarchy.companyName}</p>
+                    <p className="text-lg font-bold text-gray-900 break-words">{hierarchy.companyName}</p>
                   </div>
                 )}
               </div>
@@ -206,7 +228,7 @@ export default function UserAdminDashboard() {
         )}
 
         {/* Stats Grid */}
-        <div className="grid gap-6 md:grid-cols-3">
+        <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
           <StatCard
             title="My Displays"
             value={summary?.displays.total ?? '—'}
@@ -229,14 +251,25 @@ export default function UserAdminDashboard() {
         </div>
 
         {/* Storage and Health */}
-        <div className="grid gap-6 md:grid-cols-2" data-aos="fade-up" data-aos-delay="200">
-          <StatCard
-            title="Storage Used"
-            value={summary ? formatBytes(summary.storageBytes) : '—'}
-            subtitle="Approximate usage based on uploaded file sizes"
-            icon={<HardDrive className="h-8 w-8" />}
-            gradient="from-green-400 to-green-600"
-          />
+        <div className="grid gap-4 sm:gap-6 grid-cols-1 lg:grid-cols-2" data-aos="fade-up" data-aos-delay="200">
+          <Card className="border-gray-200 shadow-lg hover:shadow-xl transition-shadow duration-300">
+            <CardHeader className="bg-gradient-to-r from-green-50 to-emerald-50">
+              <CardTitle className="flex items-center gap-3 text-xl">
+                <div className="bg-gradient-to-br from-green-400 to-green-600 p-3 rounded-xl">
+                  <HardDrive className="h-6 w-6 text-white" />
+                </div>
+                Storage & Usage
+              </CardTitle>
+              <CardDescription>Current storage and monthly upload quota</CardDescription>
+            </CardHeader>
+            <CardContent className="pt-6">
+              {storageInfo ? (
+                <StorageIndicator storageInfo={storageInfo} />
+              ) : (
+                <div className="text-center text-gray-500 py-4">Loading storage info...</div>
+              )}
+            </CardContent>
+          </Card>
 
           <Card className="border-gray-200 shadow-lg hover:shadow-xl transition-shadow duration-300">
             <CardHeader className="bg-gradient-to-r from-yellow-50 to-orange-50">

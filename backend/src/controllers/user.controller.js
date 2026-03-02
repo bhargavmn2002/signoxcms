@@ -177,7 +177,10 @@ exports.listUsers = async (req, res) => {
           role: u.role,
           isActive: u.isActive,
           createdAt: u.createdAt,
-          clientProfile: u.clientProfile,
+          clientProfile: u.clientProfile ? {
+            ...u.clientProfile,
+            monthlyUploadedBytes: Number(u.clientProfile.monthlyUploadedBytes || 0)
+          } : null,
         })),
       });
     }
@@ -587,6 +590,12 @@ exports.getUserProfile = async (req, res) => {
     }
 
     // Return profile in format expected by Android app (ProfileResponse structure)
+    // Convert BigInt to number for JSON serialization
+    const clientProfileForResponse = user.clientProfile ? {
+      ...user.clientProfile,
+      monthlyUploadedBytes: Number(user.clientProfile.monthlyUploadedBytes || 0)
+    } : null;
+
     res.json({
       user: {
         id: user.id,
@@ -596,7 +605,7 @@ exports.getUserProfile = async (req, res) => {
         staffRole: user.staffRole,
         isActive: user.isActive,
         managedByClientAdminId: user.managedByClientAdminId,
-        clientProfile: user.clientProfile
+        clientProfile: clientProfileForResponse
       },
       hierarchy: {
         companyName: companyName,

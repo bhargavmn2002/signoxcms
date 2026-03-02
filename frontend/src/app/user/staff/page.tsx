@@ -254,45 +254,47 @@ export default function UserStaffPage() {
 
   return (
     <DashboardLayout>
-      <div className="space-y-8 pb-8">
+      <div className="space-y-6 sm:space-y-8 pb-8">
         {/* Header Section */}
         <div className="relative">
-          <div className="absolute inset-0 bg-gradient-to-r from-yellow-400/10 to-orange-500/10 rounded-3xl blur-3xl"></div>
-          <div className="relative bg-gradient-to-br from-gray-900 to-black rounded-3xl p-8 border border-gray-800 shadow-2xl">
-            <div className="flex items-center justify-between gap-4 flex-wrap">
-              <div>
-                <div className="flex items-center gap-3 mb-2">
-                  <UserCog className="h-10 w-10 text-yellow-400" />
-                  <h1 className="text-4xl font-black text-white">Staff Users</h1>
+          <div className="absolute inset-0 bg-gradient-to-r from-yellow-400/10 to-orange-500/10 rounded-2xl sm:rounded-3xl blur-3xl"></div>
+          <div className="relative bg-gradient-to-br from-gray-900 to-black rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 border border-gray-800 shadow-2xl overflow-hidden">
+            <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
+              <div className="w-full lg:w-auto min-w-0">
+                <div className="flex items-center gap-2 sm:gap-3 mb-2">
+                  <UserCog className="h-8 w-8 sm:h-10 sm:w-10 text-yellow-400 flex-shrink-0" />
+                  <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-white break-words">Users</h1>
                 </div>
-                <p className="text-gray-300 text-lg">
-                  Manage staff accounts for content and display operations.
+                <p className="text-gray-300 text-sm sm:text-base lg:text-lg break-words">
+                  Manage user accounts for content and display operations.
                 </p>
               </div>
 
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2 sm:gap-3 w-full lg:w-auto">
                 {selectedUsers.size > 0 && (
                   <Button
                     variant="destructive"
                     onClick={() => setBulkDeleteDialogOpen(true)}
-                    className="h-12 gap-2 bg-red-600 hover:bg-red-700 text-white font-bold shadow-lg"
+                    className="flex-1 sm:flex-none h-10 sm:h-12 gap-2 bg-red-600 hover:bg-red-700 text-white font-bold shadow-lg text-sm sm:text-base whitespace-nowrap"
                   >
-                    <Trash2 className="h-5 w-5" />
-                    Delete ({selectedUsers.size})
+                    <Trash2 className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
+                    <span className="hidden sm:inline">Delete ({selectedUsers.size})</span>
+                    <span className="sm:hidden">({selectedUsers.size})</span>
                   </Button>
                 )}
                 <Dialog open={open} onOpenChange={setOpen}>
                   <DialogTrigger asChild>
-                    <Button className="h-12 gap-2 bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-500 hover:to-yellow-600 text-black font-bold shadow-lg hover:shadow-yellow-500/50 transition-all duration-300 hover:scale-105">
-                      <Plus className="h-5 w-5" />
-                      Add Staff
+                    <Button className="flex-1 sm:flex-none h-10 sm:h-12 gap-2 bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-500 hover:to-yellow-600 text-black font-bold shadow-lg hover:shadow-yellow-500/50 transition-all duration-300 hover:scale-105 text-sm sm:text-base whitespace-nowrap">
+                      <Plus className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
+                      <span className="hidden sm:inline">Add User</span>
+                      <span className="sm:hidden">Add</span>
                     </Button>
                   </DialogTrigger>
                   <DialogContent className="sm:max-w-[520px] bg-white">
                     <DialogHeader>
-                      <DialogTitle className="text-2xl">Create Staff User</DialogTitle>
+                      <DialogTitle className="text-2xl">Create User</DialogTitle>
                       <DialogDescription className="text-base">
-                        Create a staff user with a specific operational role.
+                        Create a user with a specific operational role.
                       </DialogDescription>
                     </DialogHeader>
 
@@ -352,7 +354,7 @@ export default function UserStaffPage() {
                       Creating…
                     </>
                   ) : (
-                    'Create Staff'
+                    'Create User'
                   )}
                 </Button>
               </DialogFooter>
@@ -422,9 +424,9 @@ export default function UserStaffPage() {
         <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
           <DialogContent className="bg-white">
             <DialogHeader>
-              <DialogTitle>Delete Staff User</DialogTitle>
+              <DialogTitle>Delete User</DialogTitle>
               <DialogDescription>
-                Are you sure you want to permanently delete this staff user? This action cannot be undone.
+                Are you sure you want to permanently delete this user? This action cannot be undone.
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-4">
@@ -471,9 +473,9 @@ export default function UserStaffPage() {
         <Dialog open={bulkDeleteDialogOpen} onOpenChange={setBulkDeleteDialogOpen}>
           <DialogContent className="bg-white">
             <DialogHeader>
-              <DialogTitle>Delete Selected Staff Users</DialogTitle>
+              <DialogTitle>Delete Selected Users</DialogTitle>
               <DialogDescription>
-                Are you sure you want to permanently delete {selectedUsers.size} staff user(s)? This action cannot be undone.
+                Are you sure you want to permanently delete {selectedUsers.size} user(s)? This action cannot be undone.
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-4">
@@ -521,33 +523,34 @@ export default function UserStaffPage() {
         {loading ? (
           <div className="flex items-center justify-center py-12">
             <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
-            <p className="ml-3 text-gray-600">Loading staff…</p>
+            <p className="ml-3 text-gray-600">Loading users…</p>
           </div>
         ) : (
           <div className="rounded-2xl border border-gray-200 bg-white shadow-lg overflow-hidden">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="w-12">
-                    <button
-                      onClick={() => handleSelectAll(selectedUsers.size !== staff.length)}
-                      className="flex items-center justify-center"
-                      title={selectedUsers.size === staff.length ? 'Deselect All' : 'Select All'}
-                    >
-                      {selectedUsers.size === staff.length && staff.length > 0 ? (
-                        <CheckSquare className="h-5 w-5 text-blue-600" />
-                      ) : (
-                        <Square className="h-5 w-5 text-gray-400" />
-                      )}
-                    </button>
-                  </TableHead>
-                  <TableHead>Email</TableHead>
-                  <TableHead>Role</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Created</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="w-12">
+                      <button
+                        onClick={() => handleSelectAll(selectedUsers.size !== staff.length)}
+                        className="flex items-center justify-center"
+                        title={selectedUsers.size === staff.length ? 'Deselect All' : 'Select All'}
+                      >
+                        {selectedUsers.size === staff.length && staff.length > 0 ? (
+                          <CheckSquare className="h-5 w-5 text-blue-600" />
+                        ) : (
+                          <Square className="h-5 w-5 text-gray-400" />
+                        )}
+                      </button>
+                    </TableHead>
+                    <TableHead className="min-w-[200px]">Email</TableHead>
+                    <TableHead className="min-w-[150px]">Role</TableHead>
+                    <TableHead className="min-w-[100px]">Status</TableHead>
+                    <TableHead className="min-w-[120px]">Created</TableHead>
+                    <TableHead className="text-right min-w-[120px]">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
               <TableBody>
                 {staff.map((s) => (
                   <TableRow key={s.id}>
@@ -606,12 +609,13 @@ export default function UserStaffPage() {
                 {staff.length === 0 && (
                   <TableRow>
                     <TableCell colSpan={6} className="text-center text-gray-500 py-8">
-                      No staff users found. Click "Add Staff" to create one.
+                      No users found. Click "Add User" to create one.
                     </TableCell>
                   </TableRow>
                 )}
               </TableBody>
             </Table>
+            </div>
           </div>
         )}
       </div>

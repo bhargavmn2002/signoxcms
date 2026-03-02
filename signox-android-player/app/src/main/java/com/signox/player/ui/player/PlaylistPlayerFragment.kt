@@ -18,6 +18,7 @@ import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.ui.PlayerView
 import com.signox.player.R
+import com.signox.player.cache.OfflineMediaLoader
 import com.signox.player.data.api.ApiClient
 import com.signox.player.data.dto.MediaType
 import com.signox.player.data.dto.PlaylistDto
@@ -50,12 +51,19 @@ class PlaylistPlayerFragment : Fragment() {
             return exoPlayerCache ?: run {
                 val cacheDir = File(context.cacheDir, "exoplayer")
                 val databaseProvider = com.google.android.exoplayer2.database.StandaloneDatabaseProvider(context)
+                
+                // 1GB cache with eviction starting at 800MB (80% full)
+                val maxCacheSize = 1L * 1024 * 1024 * 1024 // 1GB
+                val evictionThreshold = (maxCacheSize * 0.8).toLong() // 800MB
+                
                 val cache = com.google.android.exoplayer2.upstream.cache.SimpleCache(
                     cacheDir,
-                    com.google.android.exoplayer2.upstream.cache.LeastRecentlyUsedCacheEvictor(1L * 1024 * 1024 * 1024), // 1GB cache (conservative for low-spec devices)
+                    com.google.android.exoplayer2.upstream.cache.LeastRecentlyUsedCacheEvictor(evictionThreshold),
                     databaseProvider
                 )
                 exoPlayerCache = cache
+                
+                Log.i(TAG, "ExoPlayer cache initialized: max=${formatBytes(maxCacheSize)}, eviction threshold=${formatBytes(evictionThreshold)}")
                 cache
             }
         }
@@ -65,6 +73,18 @@ class PlaylistPlayerFragment : Fragment() {
                 arguments = Bundle().apply {
                     putParcelable(ARG_PLAYLIST, playlist)
                 }
+            }
+        }
+        
+        /**
+         * Format bytes to human-readable string
+         */
+        private fun formatBytes(bytes: Long): String {
+            return when {
+                bytes < 1024 -> "$bytes B"
+                bytes < 1024 * 1024 -> "${bytes / 1024} KB"
+                bytes < 1024 * 1024 * 1024 -> "${bytes / (1024 * 1024)} MB"
+                else -> "${bytes / (1024 * 1024 * 1024)} GB"
             }
         }
     }
@@ -98,16 +118,25 @@ class PlaylistPlayerFragment : Fragment() {
         // Get or create singleton cache instance
         val simpleCache = getOrCreateCache(requireContext())
         
-        // Create cache data source factory
+        // Create data source factory that supports both HTTP and file:// URIs
+        val dataSourceFactory = com.google.android.exoplayer2.upstream.DefaultDataSource.Factory(requireContext())
+        
+        // Create cache data source factory with AGGRESSIVE caching for offline playback
         val cacheDataSourceFactory = com.google.android.exoplayer2.upstream.cache.CacheDataSource.Factory()
             .setCache(simpleCache)
-            .setUpstreamDataSourceFactory(
-                com.google.android.exoplayer2.upstream.DefaultHttpDataSource.Factory()
-                    .setConnectTimeoutMs(30000)
-                    .setReadTimeoutMs(30000)
+            .setUpstreamDataSourceFactory(dataSourceFactory)
+            .setCacheWriteDataSinkFactory(
+                com.google.android.exoplayer2.upstream.cache.CacheDataSink.Factory()
+                    .setCache(simpleCache)
             )
-            // Don't set setCacheWriteDataSinkFactory - let ExoPlayer use default (enables cache writing)
-            .setFlags(0) // No special flags = use cache if available, otherwise network (enables offline playback)
+            .setFlags(
+                // Enable aggressive caching
+                com.google.android.exoplayer2.upstream.cache.CacheDataSource.FLAG_BLOCK_ON_CACHE
+            )
+            .setCacheKeyFactory { dataSpec ->
+                // Use URL as cache key for consistent caching
+                dataSpec.uri.toString()
+            }
         
         exoPlayer = ExoPlayer.Builder(requireContext())
             .setMediaSourceFactory(
@@ -137,7 +166,12 @@ class PlaylistPlayerFragment : Fragment() {
                 override fun onPlayerError(error: com.google.android.exoplayer2.PlaybackException) {
                     Log.e(TAG, "ExoPlayer error: ${error.message}")
                     Log.e(TAG, "Error code: ${error.errorCode}")
-                    advanceToNext() // Skip to next on error
+                    Log.e(TAG, "Error cause: ${error.cause?.message}")
+                    error.cause?.printStackTrace()
+                    
+                    // On error, skip to next item (don't retry infinitely)
+                    Log.w(TAG, "Skipping to next item due to playback error")
+                    advanceToNext()
                 }
             })
             
@@ -148,7 +182,7 @@ class PlaylistPlayerFragment : Fragment() {
         binding.playerView.player = exoPlayer
         binding.playerView.useController = false // Hide controls for kiosk mode
         
-        Log.d(TAG, "ExoPlayer initialized with cache support")
+        Log.d(TAG, "ExoPlayer initialized with cache support and offline playback")
     }
     
     private fun startPlayback() {
@@ -244,14 +278,14 @@ class PlaylistPlayerFragment : Fragment() {
         }
         Log.d(TAG, "Scale type: ${binding.imageView.scaleType}")
         
-        // Build full image URL
-        val fullImageUrl = ApiClient.getMediaUrl(item.media.url)
+        // Use full URL for image loading (Glide handles caching automatically)
+        val imageUrl = ApiClient.getMediaUrl(item.media.url)
         
-        Log.d(TAG, "Loading image from: $fullImageUrl")
+        Log.d(TAG, "Loading image from: $imageUrl")
         
         // Load image with Glide (Glide handles caching automatically)
         Glide.with(this)
-            .load(fullImageUrl)
+            .load(imageUrl)
             .diskCacheStrategy(DiskCacheStrategy.ALL) // Cache both original and resized
             .error(R.drawable.ic_error_placeholder)
             .into(object : com.bumptech.glide.request.target.CustomTarget<android.graphics.drawable.Drawable>() {
@@ -368,21 +402,25 @@ class PlaylistPlayerFragment : Fragment() {
             }
         }
         
-        // Build full URL
-        val fullVideoUrl = ApiClient.getMediaUrl(videoUrlToUse)
+        // Always use HTTP URL - ExoPlayer's CacheDataSource handles everything automatically
+        // It will:
+        // 1. Check cache first
+        // 2. If cached → serve from cache (works offline)
+        // 3. If not cached → stream and cache simultaneously
+        val playbackUrl = ApiClient.getMediaUrl(videoUrlToUse)
         
-        // Check cache status
-        val cacheStatus = checkCacheStatus(fullVideoUrl)
+        // Check cache status for logging
+        val cacheStatus = checkCacheStatus(playbackUrl)
         
         Log.d(TAG, "=== VIDEO PLAYBACK INFO ===")
         Log.d(TAG, "Selected URL: $videoUrlToUse")
-        Log.d(TAG, "Full URL: $fullVideoUrl")
+        Log.d(TAG, "Full URL: $playbackUrl")
         Log.d(TAG, "Is HLS: $isHLS")
         Log.d(TAG, "Has originalUrl: $hasOriginalUrl")
         Log.d(TAG, "Cache status: $cacheStatus")
         Log.d(TAG, "========================")
         
-        val mediaItem = MediaItem.fromUri(Uri.parse(fullVideoUrl))
+        val mediaItem = MediaItem.fromUri(Uri.parse(playbackUrl))
         
         exoPlayer?.apply {
             setMediaItem(mediaItem)
@@ -463,23 +501,11 @@ class PlaylistPlayerFragment : Fragment() {
             )
             
             when {
-                cachedBytes > 0 -> "✓ Cached (${formatBytes(cachedBytes)})"
+                cachedBytes > 0 -> "✓ Cached (${Companion.formatBytes(cachedBytes)})"
                 else -> "☁ Not cached"
             }
         } catch (e: Exception) {
             "? Unknown (${e.message})"
-        }
-    }
-    
-    /**
-     * Format bytes to human-readable string
-     */
-    private fun formatBytes(bytes: Long): String {
-        return when {
-            bytes < 1024 -> "$bytes B"
-            bytes < 1024 * 1024 -> "${bytes / 1024} KB"
-            bytes < 1024 * 1024 * 1024 -> "${bytes / (1024 * 1024)} MB"
-            else -> "${bytes / (1024 * 1024 * 1024)} GB"
         }
     }
     
@@ -535,11 +561,15 @@ class PlaylistPlayerFragment : Fragment() {
         try {
             val cacheSpace = cache.cacheSpace
             val maxCacheSize = 1L * 1024 * 1024 * 1024 // 1GB
+            val evictionThreshold = (maxCacheSize * 0.8).toLong() // 800MB
             val usagePercent = (cacheSpace.toDouble() / maxCacheSize * 100).toInt()
+            val evictionPercent = (cacheSpace.toDouble() / evictionThreshold * 100).toInt()
             
             Log.i(TAG, "=== CACHE STATISTICS ===")
-            Log.i(TAG, "Cache size: ${formatBytes(cacheSpace)} / ${formatBytes(maxCacheSize)}")
-            Log.i(TAG, "Usage: $usagePercent%")
+            Log.i(TAG, "Cache size: ${Companion.formatBytes(cacheSpace)} / ${Companion.formatBytes(maxCacheSize)}")
+            Log.i(TAG, "Usage: $usagePercent% of max")
+            Log.i(TAG, "Eviction threshold: ${Companion.formatBytes(evictionThreshold)} (80%)")
+            Log.i(TAG, "Eviction status: $evictionPercent% of threshold ${if (cacheSpace >= evictionThreshold) "⚠️ WILL EVICT" else "✓ OK"}")
             Log.i(TAG, "========================")
         } catch (e: Exception) {
             Log.w(TAG, "Failed to get cache stats: ${e.message}")

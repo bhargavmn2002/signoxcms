@@ -121,7 +121,14 @@ model ClientProfile {
   // License and limits
   maxDisplays   Int       @default(10)
   maxUsers      Int       @default(5)
-  maxStorageMB  Int       @default(25) // Maximum storage in MB for all media
+  maxStorageMB  Int       @default(25) // Maximum storage in MB for all media (disk space limit)
+  
+  // Monthly usage limits (bandwidth/transfer quota)
+  maxMonthlyUsageMB    Int     @default(150) // Maximum uploads per month (6x storage by default)
+  monthlyUploadedBytes BigInt  @default(0) // Cumulative uploads this month
+  usageQuotaResetDate  DateTime @default(now()) // Last quota reset date
+  billingDayOfMonth    Int     @default(1) // Day of month to reset quota (1-28)
+  
   licenseExpiry DateTime?
   isActive      Boolean   @default(true)
 

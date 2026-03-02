@@ -3,7 +3,7 @@ const path = require('path');
 const fs = require('fs');
 const crypto = require('crypto');
 const { spawn } = require('child_process');
-const { checkStorageLimit, getClientStorageInfo, getClientAdminId } = require('../utils/storage.utils');
+const { checkStorageLimit, getClientStorageInfo, getClientAdminId, incrementMonthlyUpload } = require('../utils/storage.utils');
 const imageOptimizationService = require('../services/image-optimization.service');
 const paginationService = require('../services/pagination.service');
 const { catchAsync } = require('../middleware/error.middleware');
@@ -380,6 +380,10 @@ if (type === 'IMAGE') {
     originalUrl: media.originalUrl,   
     fileSize: media.fileSize
   });
+
+  // Increment monthly upload counter
+  await incrementMonthlyUpload(clientAdminId, fileSize);
+  console.log('📊 [MEDIA CREATE DEBUG] Monthly upload counter incremented');
 
   // Include updated storage info in response
   const updatedStorageInfo = clientAdminId ? await getClientStorageInfo(clientAdminId) : null;

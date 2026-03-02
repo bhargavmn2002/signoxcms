@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Primary Colors (Yellow/Gold theme matching web) -->
-    <color name="primary">#FCD34D</color>
-    <color name="primary_dark">#F59E0B</color>
-    <color name="primary_light">#FEF3C7</color>
-    <color name="accent">#FBBF24</color>
+    <color name="primary">#1F2937</color>
+    <color name="primary_dark">#111827</color>
+    <color name="primary_light">#374151</color>
+    <color name="accent">#FCD34D</color>
     
     <!-- Background Colors -->
     <color name="background">#F9FAFB</color>
@@ -15,7 +15,7 @@
     <color name="text_primary">#111827</color>
     <color name="text_secondary">#6B7280</color>
     <color name="text_tertiary">#9CA3AF</color>
-    <color name="text_on_primary">#1F2937</color>
+    <color name="text_on_primary">#FCD34D</color>
     
     <!-- Status Colors -->
     <color name="success">#10B981</color>

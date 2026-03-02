@@ -191,14 +191,21 @@ const requireContentManagement = (req, res, next) => {
 
 /**
  * Require content view access
+ * Allows: CLIENT_ADMIN, USER_ADMIN, and STAFF with content roles
  */
 const requireContentViewAccess = (req, res, next) => {
   if (!req.user) {
     return res.status(401).json({ message: 'Authentication required' });
   }
+  // CLIENT_ADMIN can view content for their organization
+  if (req.user.role === 'CLIENT_ADMIN') {
+    return next();
+  }
+  // USER_ADMIN can view content for their team
   if (req.user.role === 'USER_ADMIN') {
     return next();
   }
+  // STAFF with content roles can view content
   if (
     req.user.role === 'STAFF' &&
     ['CONTENT_MANAGER', 'BROADCAST_MANAGER', 'CMS_VIEWER'].includes(req.user.staffRole)
