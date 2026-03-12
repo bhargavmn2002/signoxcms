@@ -23,7 +23,7 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Plus, Edit, Trash2, Loader2, Calendar, Monitor, Activity, Search, Play, Pause } from 'lucide-react';
+import { Plus, Edit, Trash2, Loader2, Calendar, Monitor, Activity, Search } from 'lucide-react';
 import api from '@/lib/api';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
@@ -50,7 +50,6 @@ interface Display {
   status: 'ONLINE' | 'OFFLINE' | 'PAIRING' | 'ERROR';
   lastHeartbeat: string | null;
   isPaired: boolean;
-  isPaused?: boolean;
   createdAt: string;
   activeSchedule?: {
     id: string;
@@ -91,8 +90,6 @@ export default function DisplaysPage() {
   const [editLocation, setEditLocation] = useState('');
   const [editLoading, setEditLoading] = useState(false);
   const editNameInputRef = useRef<HTMLInputElement>(null);
-
-  const [togglingIds, setTogglingIds] = useState<Set<string>>(new Set());
 
   // Check if user has access
   const hasAccess =
@@ -448,51 +445,6 @@ export default function DisplaysPage() {
     }
   };
 
-  const handleTogglePlayPause = async (id: string, currentPausedState: boolean) => {
-    if (togglingIds.has(id)) {
-      return; // Already toggling
-    }
-
-    console.log('🎮 Toggle Play/Pause:', { id, currentPausedState, newState: !currentPausedState });
-
-    setTogglingIds(prev => new Set(prev).add(id));
-
-    try {
-      const newPausedState = !currentPausedState;
-      
-      console.log('📤 Sending PATCH request:', { id, isPaused: newPausedState });
-      
-      const response = await api.patch(`/displays/${id}`, {
-        isPaused: newPausedState
-      });
-
-      console.log('✅ Response:', response.data);
-
-      // Update local state immediately for better UX
-      setDisplays(prevDisplays =>
-        prevDisplays.map(d =>
-          d.id === id ? { ...d, isPaused: newPausedState } : d
-        )
-      );
-
-      console.log('🔄 Local state updated, refreshing...');
-
-      // Refresh to ensure sync
-      await fetchDisplays(true);
-    } catch (error: any) {
-      console.error('❌ Failed to toggle play/pause:', error);
-      console.error('❌ Error response:', error?.response?.data);
-      const errorMessage = error?.response?.data?.error || error?.response?.data?.message || 'Failed to update display state.';
-      alert(errorMessage);
-    } finally {
-      setTogglingIds(prev => {
-        const newSet = new Set(prev);
-        newSet.delete(id);
-        return newSet;
-      });
-    }
-  };
-
   const getStatusColor = (display: Display) => {
     if (display.status === 'ONLINE') return 'bg-green-500';
     if (display.status === 'OFFLINE') return 'bg-red-500';
@@ -777,33 +729,6 @@ export default function DisplaysPage() {
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end gap-2">
-                        {/* Play/Pause Button */}
-                        {display.status === 'ONLINE' && (
-                          <Button
-                            variant="outline"
-                            size="icon"
-                            onClick={() => {
-                              console.log('🎯 Button clicked:', { 
-                                displayId: display.id, 
-                                displayName: display.name,
-                                currentIsPaused: display.isPaused,
-                                willToggleTo: !display.isPaused 
-                              });
-                              handleTogglePlayPause(display.id, display.isPaused || false);
-                            }}
-                            disabled={togglingIds.has(display.id)}
-                            title={display.isPaused ? 'Resume playback' : 'Pause playback'}
-                            className={display.isPaused ? 'border-green-500 text-green-600 hover:bg-green-50' : 'border-yellow-500 text-yellow-600 hover:bg-yellow-50'}
-                          >
-                            {togglingIds.has(display.id) ? (
-                              <Loader2 className="h-4 w-4 animate-spin" />
-                            ) : display.isPaused ? (
-                              <Play className="h-4 w-4" />
-                            ) : (
-                              <Pause className="h-4 w-4" />
-                            )}
-                          </Button>
-                        )}
                         <Button
                           variant="outline"
                           size="icon"

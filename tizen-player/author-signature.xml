@@ -22,6 +22,11 @@ P8obhP/xMA==</DigestValue>
 <DigestValue>de16pdLTV1CyBH2Lcz0r64n7+TB4nePs9jKJEs9OqSULwnY8V/CAJ2EmHScXbHOjwmLw17We+eUV
 71M6qOl4vA==</DigestValue>
 </Reference>
+<Reference URI="deploy.sh">
+<DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha512"></DigestMethod>
+<DigestValue>z4PhNX7vuL3xVChQ1m2AB9Yg5AULVxXcg/SpIdNs6c5H0NE8XYXysP+DGNKHfuwvY7kxvUdBeoGl
+ODJ6+SfaPg==</DigestValue>
+</Reference>
 <Reference URI="icon.png">
 <DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha512"></DigestMethod>
 <DigestValue>yzVZD7BAInAIgFb8NNyDLlBvL57X4fZXIGddPbVhD+sM2bJjBVh9KZL66cIL3sXCBQRzIvuyCqzP
@@ -99,8 +104,8 @@ ttxa5ihvDQ==</DigestValue>
 </Reference>
 <Reference URI="signox-player.wgt">
 <DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha512"></DigestMethod>
-<DigestValue>25A0bANbbSVAQSLBWe7tJcax6N4CkxRzqBm4F6x01oX/hqJtraPp2ia7T4GdCo7sHQThJX90tEjS
-xM28D6ow7A==</DigestValue>
+<DigestValue>uLmuL9VzZ62D0Pm3bVJ8q35rIFHqqMRw6j86P+2JZSaSbamQk0Peu5VUXMQWxjQdbH5+/9P/X3nA
+uqqI6SkNYA==</DigestValue>
 </Reference>
 <Reference URI="signox_logo.png">
 <DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha512"></DigestMethod>
@@ -117,11 +122,11 @@ QY10fG1EWQ==</DigestValue>
 </Reference>
 </SignedInfo>
 <SignatureValue>
-VI8F1OmtstzbkgMVuxWwhM2j32BPPGHyF6a10WtQyGOI8RRl61FMISnnsd+mFX7SicL8pl4opwrA
-/XJCfubEFoJbciMUnhRQVFLH9RcOfEddPk1QLosP4w66SkdXUQ//Epn+/fWTzjeqITZplKRUKMU+
-kFOjYRPU7fSKXt3JgHNi4O8K5Ov3I/AvjHS90CL1K4WPPvRlL5Jh/hWN8jzV1dNej2SSOwanGsvv
-kVEn51EDlbeNNsgvi+PshM9ZtzEO9x6fDQUJPZxIYf/mrcX7qED+qfCoU6dIk+rdgG8yEugGjNFB
-I8GJdpG8K1bfxEwg1TMtb6zyDPmASUU84qGTxw==
+LJwPoUWhQaFTLobHivkZFmBQ6QNDwRVDhWy3QU2ISLbEtoJ2qjC8cYp7rwqT4x/5jWc4w/Q++L6E
+WOgnnyLLdn8cpVJdCJuNtCIXykpFoQrtqJBlPNEt9YDgvXLe38wkeSVqI7xXM9gPpRUGS/HBC+gi
+Bhh4LtdAGnPIH8fdCU7rNw06mejDb51jmC/BCWPY3jtsGFHESntsd9LbVzEUI9LWbfVYwWyz0BjF
+M8zf0JJw2EWLtrV0t2ErcLmHK3voEQnxj7Me66wO8sXCyXPLMbp1I49gJl5tVV/sK49/lifJLFKl
+TjPumOZkopk0/XBgm1ujWfTc8VW+GEipVtKyJQ==
 </SignatureValue>
 <KeyInfo>
 <X509Data>
