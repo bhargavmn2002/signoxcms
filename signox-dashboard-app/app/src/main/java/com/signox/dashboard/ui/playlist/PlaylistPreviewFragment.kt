@@ -172,7 +172,7 @@ class PlaylistPreviewFragment : Fragment() {
         binding.tvItemInfo.text = "Item ${index + 1} of ${items.size} • ${currentItemDuration}s duration"
         
         // Display media
-        val baseUrl = "http://192.168.1.232:5000" // TODO: Get from config
+        val baseUrl = BuildConfig.API_BASE_URL.removeSuffix("/api/")
         val fullUrl = baseUrl + item.media.url
         
         when {

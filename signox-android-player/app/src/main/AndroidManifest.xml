@@ -20,6 +20,8 @@
     <!-- Auto-start permissions -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.WRITE_SETTINGS" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
     
     <!-- Audio permissions -->
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
@@ -70,7 +72,12 @@
         <service
             android:name=".service.WatchdogService"
             android:enabled="true"
-            android:exported="false" />
+            android:exported="false"
+            android:foregroundServiceType="specialUse">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="Digital signage player monitoring" />
+        </service>
         
     </application>
 

@@ -1,11 +1,14 @@
 package com.signox.player
 
 import android.Manifest
+import android.content.BroadcastReceiver
 import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
 import android.location.Location
 import android.media.AudioManager
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -20,6 +23,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.signox.player.data.repository.PlayerRepository
 import com.signox.player.databinding.ActivityMainBinding
+import com.signox.player.receiver.ScreenStateReceiver
 import com.signox.player.service.ConfigService
 import com.signox.player.service.ConfigState
 import com.signox.player.service.KioskModeManager
@@ -37,6 +41,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var configService: ConfigService
     private lateinit var locationService: LocationService
     private lateinit var kioskModeManager: KioskModeManager
+    private var screenStateReceiver: BroadcastReceiver? = null
     
     private var isInFullscreen = false
     private var pairingCodeDialog: PairingCodeDialog? = null
@@ -63,12 +68,16 @@ class MainActivity : AppCompatActivity() {
         // Check if app was auto-started
         val autoStarted = intent.getBooleanExtra("auto_started", false)
         val watchdogRestart = intent.getBooleanExtra("watchdog_restart", false)
+        val screenOnStart = intent.getBooleanExtra("screen_on_start", false)
         
         if (autoStarted) {
             Log.d("MainActivity", "App was auto-started on boot")
         }
         if (watchdogRestart) {
             Log.d("MainActivity", "App was restarted by watchdog")
+        }
+        if (screenOnStart) {
+            Log.d("MainActivity", "App was started after screen turned on")
         }
         
         // Clear user-exited flag on normal start (allows watchdog to work again)
@@ -82,14 +91,22 @@ class MainActivity : AppCompatActivity() {
         locationService = LocationService(this)
         kioskModeManager = KioskModeManager(this)
         
-        // Start watchdog service to keep app running
-        startService(Intent(this, WatchdogService::class.java))
+        // Start watchdog service to keep app running (handle Android 8.0+ restrictions)
+        val watchdogIntent = Intent(this, WatchdogService::class.java)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForegroundService(watchdogIntent)
+        } else {
+            startService(watchdogIntent)
+        }
+        
+        // Register screen state receiver to handle display on/off
+        registerScreenStateReceiver()
         
         // Request location permissions
         requestLocationPermissions()
         
         // Enable kiosk mode immediately for auto-started apps
-        if (autoStarted || watchdogRestart) {
+        if (autoStarted || watchdogRestart || screenOnStart) {
             // Small delay to ensure system is ready
             binding.root.postDelayed({
                 kioskModeManager.enableKioskMode()
@@ -525,7 +542,12 @@ class MainActivity : AppCompatActivity() {
             enterFullscreen()
         }
         // Restart watchdog service
-        startService(Intent(this, WatchdogService::class.java))
+        val watchdogIntent = Intent(this, WatchdogService::class.java)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForegroundService(watchdogIntent)
+        } else {
+            startService(watchdogIntent)
+        }
         Log.d("MainActivity", "Kiosk mode re-enabled after PIN dialog cancelled")
     }
     
@@ -563,5 +585,33 @@ class MainActivity : AppCompatActivity() {
         dismissPairingCodePopup()
         configService.stopAll()
         locationService.stopLocationUpdates()
+        unregisterScreenStateReceiver()
+    }
+    
+    private fun registerScreenStateReceiver() {
+        try {
+            screenStateReceiver = ScreenStateReceiver()
+            val filter = IntentFilter().apply {
+                addAction(Intent.ACTION_SCREEN_ON)
+                addAction(Intent.ACTION_SCREEN_OFF)
+                addAction(Intent.ACTION_USER_PRESENT)
+            }
+            registerReceiver(screenStateReceiver, filter)
+            Log.d("MainActivity", "Screen state receiver registered")
+        } catch (e: Exception) {
+            Log.e("MainActivity", "Failed to register screen state receiver", e)
+        }
+    }
+    
+    private fun unregisterScreenStateReceiver() {
+        try {
+            screenStateReceiver?.let {
+                unregisterReceiver(it)
+                screenStateReceiver = null
+                Log.d("MainActivity", "Screen state receiver unregistered")
+            }
+        } catch (e: Exception) {
+            Log.e("MainActivity", "Failed to unregister screen state receiver", e)
+        }
     }
 }

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SignoX Media Access Test</title>
+</head>
+<body>
+    <h1>SignoX Media Access Test</h1>
+    
+    <h2>API Test</h2>
+    <button onclick="testAPI()">Test API Connection</button>
+    <div id="api-result"></div>
+    
+    <h2>Media Test</h2>
+    <button onclick="testMedia()">Test Media Access</button>
+    <div id="media-result"></div>
+    
+    <h2>Sample Media URLs</h2>
+    <div id="media-urls"></div>
+
+    <script>
+        async function testAPI() {
+            const result = document.getElementById('api-result');
+            try {
+                const response = await fetch('https://www.signoxcms.com/api/displays/pairing-code', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ deviceId: 'test-device-123' })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    result.innerHTML = `<span style="color: green;">✅ API Working: ${data.pairingCode}</span>`;
+                } else {
+                    result.innerHTML = `<span style="color: red;">❌ API Error: ${response.status}</span>`;
+                }
+            } catch (error) {
+                result.innerHTML = `<span style="color: red;">❌ API Error: ${error.message}</span>`;
+            }
+        }
+        
+        async function testMedia() {
+            const result = document.getElementById('media-result');
+            const testUrls = [
+                'https://www.signoxcms.com/uploads/',
+                'https://www.signoxcms.com/uploads/test.jpg',
+                'https://www.signoxcms.com/uploads/file-1771563867560-687659929.jpg'
+            ];
+            
+            let results = [];
+            
+            for (const url of testUrls) {
+                try {
+                    const response = await fetch(url, { method: 'HEAD' });
+                    results.push(`${url}: ${response.status} ${response.statusText}`);
+                } catch (error) {
+                    results.push(`${url}: Error - ${error.message}`);
+                }
+            }
+            
+            result.innerHTML = results.map(r => `<div>${r}</div>`).join('');
+        }
+        
+        // Auto-run tests
+        window.onload = function() {
+            testAPI();
+            setTimeout(testMedia, 1000);
+        };
+    </script>
+</body>
+</html>

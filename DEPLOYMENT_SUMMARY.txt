@@ -1,0 +1,350 @@
+╔══════════════════════════════════════════════════════════════════════╗
+║                                                                      ║
+║          SignoX On-Premise Deployment Package - COMPLETE            ║
+║                                                                      ║
+╚══════════════════════════════════════════════════════════════════════╝
+
+📦 PACKAGE CONTENTS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ 7 Documentation Files Created
+✅ 7 Deployment Scripts Created
+✅ All Scripts Executable and Ready
+✅ Complete Installation Guide
+✅ Architecture Documentation
+✅ Troubleshooting Guides
+✅ Security Best Practices
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📚 DOCUMENTATION FILES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. README_DEPLOYMENT.md (9.6 KB)
+   → Main entry point - Start here!
+   → Quick start guide
+   → Overview of all resources
+
+2. 3_STEP_INSTALLATION_GUIDE.md (15 KB)
+   → Visual step-by-step guide
+   → Perfect for first-time installation
+   → Includes verification at each step
+
+3. ON_PREMISE_DEPLOYMENT_GUIDE.md (16 KB)
+   → Comprehensive deployment manual
+   → Detailed instructions for each component
+   → Advanced configuration options
+
+4. QUICK_DEPLOYMENT_REFERENCE.md (6.7 KB)
+   → Quick reference card
+   → Common commands and tasks
+   → Troubleshooting tips
+
+5. ON_PREMISE_ARCHITECTURE.md (23 KB)
+   → System architecture diagrams
+   → Component details and data flows
+   → Network topology and security layers
+
+6. DEPLOYMENT_DOCUMENTATION_INDEX.md (9.2 KB)
+   → Complete documentation index
+   → Finding information by task/role
+   → Installation checklist
+
+7. DEPLOYMENT_CHECKLIST.md (New!)
+   → Detailed deployment checklist
+   → Track progress step-by-step
+   → Sign-off and handover documentation
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🛠️ DEPLOYMENT SCRIPTS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+deployment-scripts/
+├── full-install.sh (4.0 KB)
+│   → Complete automated installation
+│   → Runs all steps in sequence
+│   → 30-60 minutes total
+│
+├── install.sh (3.5 KB)
+│   → Install system dependencies
+│   → Node.js, MongoDB, Nginx, PM2
+│   → 10-15 minutes
+│
+├── configure-mongodb.sh (2.6 KB)
+│   → Setup MongoDB with secure credentials
+│   → Auto-generate passwords
+│   → 2-3 minutes
+│
+├── deploy-app.sh (4.5 KB)
+│   → Deploy SignoX application
+│   → Backend + Frontend
+│   → 10-15 minutes
+│
+├── configure-nginx.sh (7.7 KB)
+│   → Configure web server
+│   → SSL setup (if domain)
+│   → 5-10 minutes
+│
+├── generate-player-config.sh (2.7 KB)
+│   → Configure Android player
+│   → Update server URL
+│   → 2-3 minutes
+│
+└── README.md (6.8 KB)
+    → Scripts documentation
+    → Usage instructions
+    → Troubleshooting
+
+All scripts are executable (chmod +x applied)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🚀 QUICK START OPTIONS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Option 1: AUTOMATED (Recommended)
+┌────────────────────────────────────────────────────────────────────┐
+│ ./deployment-scripts/full-install.sh                               │
+│                                                                    │
+│ Duration: 30-60 minutes                                            │
+│ Difficulty: Easy                                                   │
+│ Best for: Quick deployment, standard configurations                │
+└────────────────────────────────────────────────────────────────────┘
+
+Option 2: STEP-BY-STEP
+┌────────────────────────────────────────────────────────────────────┐
+│ 1. ./deployment-scripts/install.sh                                 │
+│ 2. ./deployment-scripts/configure-mongodb.sh                       │
+│ 3. ./deployment-scripts/deploy-app.sh                              │
+│ 4. ./deployment-scripts/configure-nginx.sh                         │
+│ 5. ./deployment-scripts/generate-player-config.sh                  │
+│                                                                    │
+│ Duration: 45-90 minutes                                            │
+│ Difficulty: Moderate                                               │
+│ Best for: Custom configurations, learning the process              │
+└────────────────────────────────────────────────────────────────────┘
+
+Option 3: MANUAL
+┌────────────────────────────────────────────────────────────────────┐
+│ Follow: ON_PREMISE_DEPLOYMENT_GUIDE.md                             │
+│                                                                    │
+│ Duration: 1-2 hours                                                │
+│ Difficulty: Advanced                                               │
+│ Best for: Advanced users, custom setups                            │
+└────────────────────────────────────────────────────────────────────┘
+
+Option 4: REMOTE (Zeetaminds)
+┌────────────────────────────────────────────────────────────────────┐
+│ Provide remote access to Zeetaminds                                │
+│                                                                    │
+│ Duration: 30-60 minutes                                            │
+│ Difficulty: None                                                   │
+│ Best for: Fastest deployment, professional setup                   │
+└────────────────────────────────────────────────────────────────────┘
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📖 RECOMMENDED READING ORDER
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+For First-Time Users:
+  1. README_DEPLOYMENT.md          (Overview)
+  2. 3_STEP_INSTALLATION_GUIDE.md  (Visual guide)
+  3. Run: ./deployment-scripts/full-install.sh
+  4. Use: DEPLOYMENT_CHECKLIST.md  (Track progress)
+
+For System Administrators:
+  1. ON_PREMISE_ARCHITECTURE.md    (Understand system)
+  2. ON_PREMISE_DEPLOYMENT_GUIDE.md (Detailed steps)
+  3. deployment-scripts/README.md   (Scripts guide)
+  4. DEPLOYMENT_CHECKLIST.md        (Track deployment)
+
+For Quick Reference:
+  → QUICK_DEPLOYMENT_REFERENCE.md
+
+For Finding Information:
+  → DEPLOYMENT_DOCUMENTATION_INDEX.md
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🎯 WHAT YOU GET
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Server Components:
+  ✓ Node.js 18.x (JavaScript runtime)
+  ✓ MongoDB 6.x (Database)
+  ✓ Nginx (Web server & reverse proxy)
+  ✓ PM2 (Process manager)
+  ✓ Certbot (SSL certificates)
+
+SignoX Applications:
+  ✓ Backend API (Node.js/Express)
+  ✓ Frontend CMS (Next.js)
+  ✓ Android Player APK (Custom configured)
+
+Configuration:
+  ✓ SSL certificate (if domain)
+  ✓ Firewall rules (UFW)
+  ✓ Automatic service startup
+  ✓ Log rotation
+  ✓ Backup directories
+
+Documentation:
+  ✓ Complete deployment guides
+  ✓ Architecture documentation
+  ✓ Troubleshooting guides
+  ✓ Security best practices
+  ✓ Maintenance procedures
+  ✓ Quick reference cards
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+💻 SYSTEM REQUIREMENTS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Minimum:
+  • OS: Ubuntu 22.04 LTS
+  • CPU: 4 cores
+  • RAM: 8GB
+  • Storage: 100GB SSD
+  • Network: Static IP or domain
+
+Recommended:
+  • OS: Ubuntu 22.04 LTS
+  • CPU: 8 cores
+  • RAM: 16GB
+  • Storage: 500GB SSD
+  • Network: Static IP with domain
+
+Ports Required:
+  • 22 (SSH)
+  • 80 (HTTP)
+  • 443 (HTTPS)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+⏱️ INSTALLATION TIME
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Step 1: Server Setup          30-60 minutes
+Step 2: Player APK             15 minutes
+Step 3: CMS Access & Pairing   15 minutes
+────────────────────────────────────────
+Total:                         1-2 hours
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔑 DEFAULT CREDENTIALS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+CMS Admin:
+  Email: admin@signox.com
+  Password: Admin@123
+
+⚠️  CHANGE IMMEDIATELY AFTER FIRST LOGIN!
+
+MongoDB:
+  Credentials auto-generated and saved to:
+  ~/signox-mongodb-credentials.txt
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📂 FILE LOCATIONS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Application:
+  /var/www/signox/
+
+Configuration:
+  /var/www/signox/backend/.env
+  /var/www/signox/frontend/.env
+  /etc/nginx/sites-available/signox
+
+Media Files:
+  /var/www/signox/backend/public/uploads/
+
+SSL Certificates:
+  /etc/letsencrypt/live/[domain]/
+
+Backups:
+  /var/backups/signox/
+
+Credentials:
+  ~/signox-mongodb-credentials.txt
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔧 COMMON COMMANDS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Check Services:
+  pm2 status
+  sudo systemctl status nginx
+  sudo systemctl status mongod
+
+View Logs:
+  pm2 logs
+  pm2 logs signox-backend
+  pm2 logs signox-frontend
+
+Restart Services:
+  pm2 restart all
+  sudo systemctl restart nginx
+
+Backup:
+  mongodump --uri="..." --out=/var/backups/signox/$(date +%Y%m%d)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ SUCCESS CRITERIA
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Your installation is successful when:
+
+  ✓ CMS accessible from browser
+  ✓ All services running (pm2 status)
+  ✓ Displays paired and online
+  ✓ Content playing on displays
+  ✓ Admin password changed
+  ✓ Backup configured
+  ✓ SSL certificate active (if domain)
+  ✓ No errors in logs
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📞 SUPPORT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Documentation:
+  • README_DEPLOYMENT.md
+  • 3_STEP_INSTALLATION_GUIDE.md
+  • QUICK_DEPLOYMENT_REFERENCE.md
+  • ON_PREMISE_DEPLOYMENT_GUIDE.md
+
+Zeetaminds Support:
+  • Remote installation assistance
+  • Custom APK generation
+  • Technical troubleshooting
+  • Training and onboarding
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🎉 READY TO DEPLOY!
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Start with:
+  1. Read: README_DEPLOYMENT.md
+  2. Run: ./deployment-scripts/full-install.sh
+  3. Track: DEPLOYMENT_CHECKLIST.md
+
+Your SignoX on-premise system will be ready in 1-2 hours!
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Version: 1.0
+Date: March 2026
+Package: SignoX On-Premise Deployment
+Prepared by: Kiro AI Assistant
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
