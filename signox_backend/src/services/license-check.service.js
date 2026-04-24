@@ -15,8 +15,8 @@ const checkExpiredLicenses = async () => {
 
     const now = new Date();
 
-    // Find all client profiles with expired licenses that are still active
-    const expiredProfiles = await prisma.clientProfile.findMany({
+    // Find all user admin profiles with expired licenses that are still active
+    const expiredProfiles = await prisma.userAdminProfile.findMany({
       where: {
         isActive: true,
         licenseExpiry: {
@@ -24,7 +24,7 @@ const checkExpiredLicenses = async () => {
         },
       },
       include: {
-        clientAdmin: {
+        userAdmin: {
           select: {
             id: true,
             email: true,
@@ -41,24 +41,24 @@ const checkExpiredLicenses = async () => {
 
     console.log(`⚠️  Found ${expiredProfiles.length} expired license(s)`);
 
-    // Suspend each expired client profile
+    // Suspend each expired user admin profile
     for (const profile of expiredProfiles) {
       try {
-        // Update client profile to inactive
-        await prisma.clientProfile.update({
+        // Update user admin profile to inactive
+        await prisma.userAdminProfile.update({
           where: { id: profile.id },
           data: { isActive: false },
         });
 
-        console.log(`🔒 Suspended license for client: ${profile.clientAdmin.email} (${profile.clientId})`);
+        console.log(`🔒 Suspended license for user admin: ${profile.userAdmin.email} (${profile.userAdminId})`);
         console.log(`   License expired on: ${profile.licenseExpiry}`);
         console.log(`   Company: ${profile.companyName || 'N/A'}`);
 
-        // Optionally: Send notification email to client admin
-        // await sendLicenseExpiredEmail(profile.clientAdmin.email, profile);
+        // Optionally: Send notification email to user admin
+        // await sendLicenseExpiredEmail(profile.userAdmin.email, profile);
 
       } catch (error) {
-        console.error(`❌ Failed to suspend license for client ${profile.clientId}:`, error.message);
+        console.error(`❌ Failed to suspend license for user admin ${profile.userAdminId}:`, error.message);
       }
     }
 

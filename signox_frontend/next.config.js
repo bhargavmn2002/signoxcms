@@ -2,7 +2,7 @@
 const nextConfig = {
   reactStrictMode: true,
   devIndicators: false,
-  allowedDevOrigins: ['10.69.139.157'],
+  allowedDevOrigins: ['192.168.1.232'],
   experimental: {
     serverActions: {
       allowedOrigins: [

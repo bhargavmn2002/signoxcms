@@ -67,6 +67,17 @@ type UserProfile = {
   staffRole?: string;
   isActive: boolean;
   createdAt: string;
+  userAdminProfile?: {
+    maxDisplays: number;
+    maxUsers: number;
+    maxStorageMB: number;
+    maxMonthlyUsageMB: number;
+    monthlyUploadedBytes: number;
+    licenseExpiry?: string;
+    isActive: boolean;
+    companyName?: string;
+    contactNumber?: string;
+  };
 };
 
 function formatBytes(bytes: number) {
